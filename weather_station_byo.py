@@ -11,6 +11,20 @@ import wind_direction_byo
 import ds18b20_therm
 import bme280_sensor
 
+from kafka import KafkaProducer
+from kafka.errors import KafkaError
+
+def publish(msg):
+    brokers = 
+    topic = 'weather-station'
+    producer = KafkaProducer(bootstrap_servers=brokers)
+    future = producer.send(topic, str.encode(msg))
+    try:
+        record_metadata = future.get(timeout=10)
+    except KafkaError as ke:
+        print(ke)
+        pass
+
 # adjust for anemometer factor
 # resulting from the wind energy lost when the arms turn
 ADJUSTMENT = 1.18
@@ -110,10 +124,13 @@ while True:
         "rainfall" : rainfall,
         "humidity" : humidity,
         "pressure" : pressure,
-        "temperatur" : temperature
+        "temperature" : temperature
     }
 
-    print(json.dumps(readings_dict, indent=4))
+    msg = json.dumps(readings_dict)
+
+    print(msg)
+    publish(msg)
 
     # reset readings
     store_speeds = []
