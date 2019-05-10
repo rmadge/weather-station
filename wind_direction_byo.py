@@ -34,6 +34,9 @@ def currentEpoch():
 # directional statistics
 # https://en.wikipedia.org/wiki/Directional_statistics
 def get_average(angles):
+    
+    average = -1.0
+
     sin_sum = 0.0
     cos_sum = 0.0
 
@@ -41,21 +44,26 @@ def get_average(angles):
         r = math.radians(angle)
         sin_sum += math.sin(r)
         cos_sum += math.cos(r)
-
+    
     flen = float(len(angles))
+    if flen == 0:
+        print(
+            "ERROR: len(angles) == 0 (angles: {}, sin_sum: {}, cos_sum: {}".format(
+                angles, sin_sum, cos_sum
+            )
+        )
+    else:
+        s = sin_sum /flen
+        c = cos_sum /flen
 
-    s = sin_sum /flen
-    c = cos_sum /flen
+        arc = math.degrees(math.atan(s / c))    
 
-    arc = math.degrees(math.atan(s / c))
-    average = 0.0
-
-    if s > 0 and c > 0:
-        average = arc
-    elif c < 0:
-        average = arc + 180
-    elif s < 0 and c > 0:
-        average = arc + 360
+        if s > 0 and c > 0:
+            average = arc
+        elif c < 0:
+            average = arc + 180
+        elif s < 0 and c > 0:
+            average = arc + 360
 
     return 0.0 if average == 360 else average
 
@@ -65,10 +73,15 @@ def get_value(interval=5):
 
     while time.time() - start_time < interval:
         wind = round(adc.value * 3.3, 1)
-        if not wind in volts: # keep only good measurements
-            print('unknown value: ' + str(wind)) 
-        else:
+        if wind in volts:
             data.append(volts[wind])
+        #else:
+        #    print('unknown value: ' + str(wind)) 
+
+        #if not wind in volts: # keep only good measurements
+        #    print('unknown value: ' + str(wind)) 
+        #else:
+        #    data.append(volts[wind])
 
     return get_average(data)
 

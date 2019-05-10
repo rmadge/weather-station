@@ -10,12 +10,24 @@ import statistics
 import wind_direction_byo
 import ds18b20_therm
 import bme280_sensor
+import solar_radiation as sr
 
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
+import yaml
+yaml.warnings({'YAMLLoadWarning': False})
+
+yaml_dict = []
+with open("weather-station.yaml", "r") as file:
+    yaml_dict = yaml.safe_load(file)
+print(yaml_dict)
+
+solar_latitude = yaml_dict['solar_latitude']
+solar_longitude = yaml_dict['solar_longitude']
+
 def publish(msg):
-    brokers = 
+    brokers = yaml_dict['kafka_brokers']
     topic = 'weather-station'
     producer = KafkaProducer(bootstrap_servers=brokers)
     future = producer.send(topic, str.encode(msg))
@@ -114,6 +126,7 @@ while True:
     wind_speed_max = max(store_speeds) # wind gust
     wind_speed_last = store_speeds[-1]
     wind_speed_avg = statistics.mean(store_speeds)
+    altitude, azimuth, radiation = sr.get_solar_details(solar_latitude, solar_longitude)
 
     readings_dict = {
         "timestamp_epoch" : currentEpoch(),
@@ -124,7 +137,10 @@ while True:
         "rainfall" : rainfall,
         "humidity" : humidity,
         "pressure" : pressure,
-        "temperature" : temperature
+        "temperature" : temperature,
+        "solar_altitude" : altitude,
+        "solar_azimuth" : azimuth,
+        "solar_radiation" : radiation
     }
 
     msg = json.dumps(readings_dict)
