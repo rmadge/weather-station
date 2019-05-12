@@ -53,6 +53,9 @@ wind_interval = 5 # how often to report speed
 store_speeds = []
 store_directions = []
 
+#ground temperature
+ground_temp_probe = ds18b20_therm.DS18B20()
+
 # rainfall
 BUCKET_SIZE = 0.2794
 rain_count = 0
@@ -128,6 +131,9 @@ while True:
     wind_speed_avg = statistics.mean(store_speeds)
     altitude, azimuth, radiation = sr.get_solar_details(solar_latitude, solar_longitude)
 
+    # group temperature
+    temp_ground = ground_temp_probe.read_temp()
+
     readings_dict = {
         "timestamp_epoch" : currentEpoch(),
         "wind_direction_avg" : wind_direction_avg,
@@ -140,10 +146,11 @@ while True:
         "temperature" : temperature,
         "solar_altitude" : altitude,
         "solar_azimuth" : azimuth,
-        "solar_radiation" : radiation
+        "solar_radiation" : radiation,
+        "temperature_ground" : temp_ground
     }
 
-    msg = json.dumps(readings_dict)
+    msg = json.dumps(readings_dict, sort_keys=True)
 
     print(msg)
     publish(msg)

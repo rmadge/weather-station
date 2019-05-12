@@ -1,0 +1,17 @@
+https://www.instructables.com/id/52kW-Solar-Tracker-Controlled-by-Raspberry-Pi/
+
+http://pysolar.org/
+https://rhodesmill.org/pyephem/
+https://sunpy.org/
+
+remote debugging
+https://code.visualstudio.com/docs/python/debugging#_remote-debugging
+
+remote development
+https://code.visualstudio.com/docs/remote/remote-overview
+
+circuit.io
+https://www.circuito.io/
+
+measuring light
+https://learn.adafruit.com/photocells/measuring-light
